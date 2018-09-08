@@ -1,0 +1,105 @@
+<html>
+<head>
+    <link href="css.css" type="text/css" rel="stylesheet"/>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" type="text/css" rel="stylesheet"/>
+</head>
+<body ng-controller="PageCtrl">
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">SignalX Chat Sample App</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</nav>
+<div class="container">
+    <h3 class=" text-center">
+        <br/>
+    </h3>
+    <div class="messaging">
+        <div class="inbox_msg">
+            <div class="inbox_people">
+                <div class="headind_srch">
+                    <div class="recent_heading">
+                        <h4>Recent</h4>
+                    </div>
+                    <div class="srch_bar">
+                        <div class="stylish-input-group">
+                            <input type="text" class="search-bar" placeholder="Search" ng-model="schats.serach">
+                            <span class="input-group-addon">
+                                <button type="button">
+                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="inbox_chat">
+                    <div ng-click="schats.setActiveChat(chat)" style="cursor: pointer;" class="chat_list {{chat.active?'active_chat':''}}"
+                         ng-repeat="chat in schats.mainList  | filter:schats.serach">
+                        <div class="chat_people">
+                            <div class="chat_img">
+                                <img ng-src="{{chat.image}}" alt="sunil">
+                            </div>
+                            <div class="chat_ib">
+                                <h5>
+                                    {{chat.name}}
+                                    <span class="chat_date">{{chat.date}}</span>
+                                </h5>
+                                <p>{{chat.lastMessage}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mesgs">
+                <div class="msg_history">
+                    <div ng-repeat="message in schats.activeChat.messages">
+                        <div ng-show="message.sent" class="outgoing_msg">
+                            <div class="sent_msg">
+                                <p>{{message.message}}</p>
+                                <span class="time_date"> 11:01 AM | Today</span>
+                            </div>
+                        </div>
+                        <div class="incoming_msg" ng-hide="message.sent">
+                            <div class="incoming_msg_img">
+                                <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil">
+                            </div>
+                            <div class="received_msg">
+                                <div class="received_withd_msg">
+                                    <p>{{message.message}}</p>
+                                    <span class="time_date"> 11:01 AM | Today</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="type_msg">
+                    <div class="input_msg_write">
+                        <input type="text" class="write_msg" my-enter="schats.sendMessage()" placeholder="Type a message"
+                               ng-model="schats.currentMessage"/>
+                        <button class="msg_send_btn" type="button" ng-click="schats.sendMessage()">
+                            <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p class="text-center top_spac">
+            <a target="_blank" href="https://www.nuget.org/packages/SignalX">
+                Download SignalX From Nuget | PM>
+                Install-Package SignalX
+            </a>
+        </p>
+    </div>
+</div>
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="https://ajax.aspnetcdn.com/ajax/signalr/jquery.signalr-2.2.0.js"></script>
+<script src="https://unpkg.com/signalx"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.2/angular.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="script.js">
+</script>
+</body>
+</html>
