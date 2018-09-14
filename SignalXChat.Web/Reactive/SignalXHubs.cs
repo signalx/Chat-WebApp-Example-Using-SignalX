@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Microsoft.AspNet.SignalR.Messaging;
     using Newtonsoft.Json;
     using SignalXLib.Lib;
 
@@ -12,79 +13,154 @@
         {
             SignalX.Instance.AuthenticationHandler(request => true);
 
+            SignalX.Instance.Settings.ContinueClientExecutionWhenAnyServerOnClientReadyFails = false;
+            SignalX.Instance.Server(
+                "getMessageId",
+                request =>
+                {
+                    request.RespondToSender(Guid.NewGuid().ToString());
+                });
+            SignalX.Instance.Server(
+                "getUserMessages",
+                request =>
+                {
+                   var userId= request.Message;
+                    request.RespondToSender(MessageStore[userId]);
+                });
+
             SignalX.Instance.Server(
                 "sendMessage",
                 request =>
                 {
-                    request.RespondToAll("newMessage", request.Message);
-
                     Messages message = JsonConvert.DeserializeObject<Messages>(JsonConvert.SerializeObject(request.Message));
-                    message.sent = false;
+                   Messages messages = JsonConvert.DeserializeObject<Messages>(JsonConvert.SerializeObject(request.Message));
+
+                    MessageStore[message.receiver].Add(message);
+
+                    request.RespondToAll("newMessage", message);
+                   
+                    
                     Task.Delay(TimeSpan.FromSeconds(3)).ContinueWith(
-                        c => { SignalX.Instance.RespondToAll("newMessage", message); });
+                        c =>
+                        {
+                            messages.sent = false;
+                            MessageStore[messages.receiver].Add(messages);
+                            SignalX.Instance.RespondToAll("newMessage", messages);
+                        });
                 });
 
             SignalX.Instance.ServerAuthorized(
                 "getChats",
                 (request, state) =>
                 {
-                    var list = new List<ChatList>();
-                    int Id = 0;
-                    NewMethod(list, Id);
+                    
+                    var list = new List<User>();
+                 
+                    NewMethod(list, "bam");
+                    NewMethod(list, "sam");
                     request.RespondToSender(list);
 
-                    Task.Delay(TimeSpan.FromSeconds(5)).ContinueWith(
-                        c =>
-                        {
-                            NewMethod(list, Id);
-                            SignalX.Instance.RespondToAll("receiveNewConversation", list);
-                        });
+                   
                 });
         }
 
-        static void NewMethod(List<ChatList> list, int Id)
+        static void NewMethod(List<User> list, string Id)
         {
             list.Add(
-                new ChatList
+                new User()
                 {
                     active = false,
+                    id= Id,
                     name = "SignalXUser " + Id,
                     date = "Dec " + (Id + 20),
-                    lastMessage = "Test, which is a new approach to have all solutions astrology under one roof.",
+                    description = "some description",
                     image = "https://ptetutorials.com/images/user-profile.png",
-                    messages = new List<Messages>
-                    {
-                        createMessage(true),
-                        createMessage(),
-                        createMessage(true),
-                        createMessage()
-                    }
+                  
                 });
         }
 
-        public static Messages createMessage(bool sent = false)
+        public static Dictionary<string, List<Messages>> MessageStore=new Dictionary<string, List<Messages>>()
         {
-            return new Messages
+            {"sam",new List<Messages>
             {
-                sent = sent,
-                message = "yo so we are " + Guid.NewGuid()
-            };
-        }
+                new Messages
+                {
+                    sent = true,
+                    message = "yo so we are " + Guid.NewGuid(),
+                    messageId = Guid.NewGuid().ToString(),
+                    sender = "",
+                    receiver = ""
+                },
+                new Messages
+                {
+                    sent = false,
+                    message = "yo so we are " + Guid.NewGuid(),
+                    messageId = Guid.NewGuid().ToString(),
+                    sender = "",
+                    receiver = ""
+                }
+            }
+
+            },
+            {"bam",new List<Messages>
+                {
+                    new Messages
+                    {
+                        sent = true,
+                        message = "yo so we are " + Guid.NewGuid(),
+                        messageId = Guid.NewGuid().ToString(),
+                        sender = "",
+                        receiver = ""
+                    },
+                    new Messages
+                    {
+                        sent = false,
+                        message = "yo so we are " + Guid.NewGuid(),
+                        messageId = Guid.NewGuid().ToString(),
+                        sender = "",
+                        receiver = ""
+                    }
+                }
+
+            }
+        };
+       
     }
 
     public class Messages
     {
         public string message;
         public bool sent;
+        public string messageId;
+        public string sender;
+        public string receiver;
+
     }
 
-    public class ChatList
+
+
+    public class User
     {
+        public string name;
+        public string id;
         public bool active;
         public string date;
         public string image;
-        public string lastMessage;
-        public object messages;
+        public string description;
+    }
+    public class ChatList
+    {
+        [Obsolete]
         public string name;
+        [Obsolete]
+        public string date;
+        [Obsolete]
+        public string image;
+        [Obsolete]
+        public string description;
+
+
+        public bool active;
+        public string id;
     }
 }
