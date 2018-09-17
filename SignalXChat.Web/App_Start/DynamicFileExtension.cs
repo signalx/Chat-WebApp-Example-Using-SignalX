@@ -15,7 +15,7 @@
         {
             app.Use(
                 new Func<AppFunc, AppFunc>(
-                    next => (async env =>
+                    next => async env =>
                     {
                         var requestBody = (Stream)env["owin.RequestBody"];
                         var requestHeaders = (IDictionary<string, string[]>)env["owin.RequestHeaders"];
@@ -57,7 +57,7 @@
                         }
 
                         await next.Invoke(env);
-                    })));
+                    }));
         }
     }
 }
