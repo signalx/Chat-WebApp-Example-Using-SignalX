@@ -56,7 +56,7 @@
 
         public static async Task Register()
         {
-            SignalX.Instance.AuthenticationHandler(request => true);
+            SignalX.Instance.AuthenticationHandler( request => Task.FromResult(true));
 
             SignalX.Instance.Settings.ContinueClientExecutionWhenAnyServerOnClientReadyFails = false;
             SignalX.Instance.Server(
@@ -66,7 +66,7 @@
                 "getUserMessages",
                 request =>
                 {
-                    dynamic userId = request.Message;
+                    dynamic userId = request.MessageAs<string>();
                     request.RespondToSender(MessageStore[userId]);
                 });
             SignalX.Instance.OnException(
@@ -78,8 +78,8 @@
                 "sendMessage",
                async (request,t) =>
                 {
-                    Messages message = JsonConvert.DeserializeObject<Messages>(JsonConvert.SerializeObject(request.Message));
-                    Messages messages = JsonConvert.DeserializeObject<Messages>(JsonConvert.SerializeObject(request.Message));
+                    Messages message = request.MessageAs<Messages>();
+                    Messages messages = request.MessageAs<Messages>(); 
 
                     MessageStore[message.receiver].Add(message);
 

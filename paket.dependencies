@@ -9,6 +9,6 @@ nuget Microsoft.Owin 4.0.0
 nuget Microsoft.Owin.Host.SystemWeb 4.0.0  
 nuget Newtonsoft.Json 
 nuget Owin 1.0  
-nuget SignalX 4.0.0-pre
+nuget SignalX 6.0.0-pre
 nuget System.Collections.Immutable 1.5.0
 nuget Microsoft.AspNet.SignalR.Core  >= 2.2.3
